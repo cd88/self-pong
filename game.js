@@ -3,17 +3,20 @@ var canvasContext;
 var gameHeight;
 var gameWidth;
 
-var ballX = 500;
-var ballY = 400;
+var ballX = 100;
+var ballY = 200;
 var ballRadius = 5;
 var ballHeight = ballRadius * 2;
 var ballWidth = ballRadius * 2;
-var ballSpeedX = 23;
+var ballSpeedX = -2;
 var ballSpeedY = 2;
 
 var userPaddleY = 250;
 var userPaddleHeight = 100;
 var userPaddleWidth = 12;
+var userPaddleMargin = 20;
+var userPaddleSurfaceX = userPaddleMargin + userPaddleWidth;
+var userPaddleBottom = userPaddleY + userPaddleHeight;
 
 var gameViewportPosY;
 var minPaddleY;
@@ -47,10 +50,10 @@ function handleMouseMove(event) {
 
 	event = event || window.event; // IE-ism
 
-	// If pageX/Y aren't available and clientX/Y
+	// IfpageX/Y aren't available and clientX/Y
 	// are, calculate pageX/Y - logic taken from jQuery
-		// Calculate pageX/Y if missing and clientX/Y available
-	if (event.pageX == null && event.clientX != null) {
+		// Calculate pageX/Y ifmissing and clientX/Y available
+	if(event.pageX == null && event.clientX != null) {
 	eventDoc = (event.target && event.target.ownerDocument) || document;
 	doc = eventDoc.documentElement;
 	body = eventDoc.body;
@@ -76,21 +79,32 @@ function handleMouseMove(event) {
 
 function moveUserPaddle(posY) {
 	//paddle reached the top
-	if (posY < minPaddleY) {
+	if(posY < minPaddleY) {
 		userPaddleY = 0;
 	}
 
 	//paddle reached the bottom
-	else if (posY > maxPaddleY) {
+	else if(posY > maxPaddleY) {
 		userPaddleY = gameHeight - userPaddleHeight;
 	}
 	else userPaddleY = posY - userPaddleHeight/2;
+	userPaddleBottom = userPaddleY + userPaddleHeight;
 }
 
 function moveBall() {
-	if (ballX >= gameWidth - ballRadius || ballX <= ballRadius) ballSpeedX = -ballSpeedX;
-	if (ballY >= gameHeight - ballRadius || ballY <= ballRadius) ballSpeedY = -ballSpeedY;
-	
+	if(ballX >= gameWidth - ballRadius || ballX <= ballRadius) ballSpeedX = -ballSpeedX;
+	if(ballY >= gameHeight - ballRadius || ballY <= ballRadius) ballSpeedY = -ballSpeedY;
+
+	if(ballSpeedX < 0) {
+		if(ballX <= userPaddleSurfaceX - ballSpeedX/2 && ballX >= userPaddleSurfaceX + ballSpeedX/2) {
+			if(ballY > userPaddleY && ballY < userPaddleBottom) {
+				ballSpeedX = -ballSpeedX;
+				console.log("ball hit paddle")
+			}
+			else console.log("ballY: " + ballY + "\nuserPaddleY: " + userPaddleY + "\nuserPaddleBottom: " + userPaddleBottom);
+		}
+	}
+
 	ballX += ballSpeedX;
 	ballY += ballSpeedY;
 	
@@ -103,7 +117,10 @@ function drawEverything() {
 	canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
 	canvasContext.fillStyle = "white";
-	canvasContext.fillRect(20, userPaddleY, userPaddleWidth, userPaddleHeight);
+	canvasContext.fillRect(userPaddleMargin, userPaddleY, userPaddleWidth, userPaddleHeight);
+
+	canvasContext.fillStyle = "white";
+	canvasContext.fillRect(768, userPaddleY, userPaddleWidth, userPaddleHeight);
 	
 	canvasContext.beginPath();
 	canvasContext.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
