@@ -2,16 +2,21 @@ var canvas;
 var canvasContext;
 var gameHeight;
 var gameWidth;
+var fps = 1000/33
 
 var ballX = 100;
-var ballY = 200;
+var ballY = 300;
 var ballRadius = 5;
 var ballHeight = ballRadius * 2;
 var ballWidth = ballRadius * 2;
 var ballSpeedX = -2;
-var ballSpeedY = 2;
+var ballSpeedY = -2;
+var ballLeft;
+var ballTop;
 
 var userPaddleY = 250;
+var prevPaddleY = 250;
+var paddleVelocity = 0;
 var userPaddleHeight = 100;
 var userPaddleWidth = 12;
 var userPaddleMargin = 20;
@@ -21,6 +26,10 @@ var userPaddleBottom = userPaddleY + userPaddleHeight;
 var gameViewportPosY;
 var minPaddleY;
 var maxPaddleY;
+var paddleTimer;
+
+var hitCount = 0;
+
 
 
 
@@ -36,12 +45,11 @@ window.onload = function() {
 
     document.onmousemove = handleMouseMove;
 
-	var fps = 33;
 	setInterval(function()
 		{
 			drawEverything();
 			moveBall();
-		}, 1000/fps);
+		}, fps);
 }
 
 function handleMouseMove(event) {
@@ -66,15 +74,28 @@ function handleMouseMove(event) {
 		(doc && doc.clientTop  || body && body.clientTop  || 0 );
 	}
 
-	dot = document.createElement('div');
-	dot.className = "dot";
-	dot.style.left = event.pageX + "px";
-	dot.style.top = event.pageY + "px";
-	document.body.appendChild(dot);
+// create white dots to show where the cursor has been
+	// dot = document.createElement('div');
+	// dot.className = "dot";
+	// dot.style.left = event.pageX + "px";
+	// dot.style.top = event.pageY + "px";
+	// document.body.appendChild(dot);
 
 	// console.log( event.pageY, event.pageX)
-	moveUserPaddle(event.pageY);
 
+	moveUserPaddle(event.pageY);
+	window.clearTimeout(paddleTimer);
+	paddleTimer = window.setTimeout(function() {paddleVelocity = 0; console.log(paddleVelocity)}, fps);
+
+}
+
+function calculatePaddleVelocity(posY) {
+	if(prevPaddleY && posY != prevPaddleY && posY > minPaddleY && posY < maxPaddleY) {
+		paddleVelocity = posY > prevPaddleY ? Math.pow((posY - prevPaddleY), .4) : Math.pow((prevPaddleY - posY), .4) * -1 || 0;
+		console.log("paddleVelocity: " + paddleVelocity + " diff: " + (posY - prevPaddleY));
+	}
+	else console.log(paddleVelocity, prevPaddleY, posY);
+	prevPaddleY = posY;
 }
 
 function moveUserPaddle(posY) {
@@ -89,6 +110,8 @@ function moveUserPaddle(posY) {
 	}
 	else userPaddleY = posY - userPaddleHeight/2;
 	userPaddleBottom = userPaddleY + userPaddleHeight;
+	
+	calculatePaddleVelocity(posY);
 }
 
 function moveBall() {
@@ -96,12 +119,19 @@ function moveBall() {
 	if(ballY >= gameHeight - ballRadius || ballY <= ballRadius) ballSpeedY = -ballSpeedY;
 
 	if(ballSpeedX < 0) {
-		if(ballX <= userPaddleSurfaceX - ballSpeedX/2 && ballX >= userPaddleSurfaceX + ballSpeedX/2) {
-			if(ballY > userPaddleY && ballY < userPaddleBottom) {
-				ballSpeedX = -ballSpeedX;
+		ballLeft = ballX - ballRadius;
+		if(ballLeft <= userPaddleSurfaceX - ballSpeedX/2 && ballLeft >= userPaddleSurfaceX + ballSpeedX/2) {
+			if(ballY + (ballRadius * (Math.sqrt(2)))/2 > userPaddleY && ballY - (ballRadius * (Math.sqrt(2)))/2 <= userPaddleBottom) {
+				hitCount ++;
+				if(paddleVelocity) {
+					Math.abs(Math)
+				}
+				if (hitCount % 3 === 0) ballSpeedX = -ballSpeedX + 1
+					else ballSpeedX = -ballSpeedX;
+
 				console.log("ball hit paddle")
 			}
-			else console.log("ballY: " + ballY + "\nuserPaddleY: " + userPaddleY + "\nuserPaddleBottom: " + userPaddleBottom);
+			else console.log("ballY: " + ballY + "\nuserPaddleY: " + userPaddleY + "\nball bottom-left corner: " + (ballY + (ballRadius * (Math.sqrt(2)))/2) + "\nuserPaddleBottom: " + userPaddleBottom + "\nball top-left corner: " + (ballY - (ballRadius * (Math.sqrt(2)))/2));
 		}
 	}
 
