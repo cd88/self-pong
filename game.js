@@ -106,7 +106,7 @@ function handleMouseMove(event) {
 	moveUserPaddle(event.pageY);
 	window.clearTimeout(paddleTimer);
 	// zeroes out paddleVelocity after a frame of inaction.
-	paddleTimer = window.setTimeout(function() {paddleVelocity = 0; if(logEnabled)console.log(`paddleVelocity: ${paddleVelocity}`)}, 1000/fps);
+	paddleTimer = window.setTimeout(function() {paddleVelocity = 0; if(logEnabled)console.log(`paddleVelocity: ${Math.round((paddleVelocity * 100) / 100)}`)}, 1000/fps);
 
 }
 
@@ -119,11 +119,11 @@ function handleKeyPress(){
 
 		if(event.key == 'ArrowUp'){
 			fps++;
-			console.log(`fps: ${fps} \nballVelocity: ${ballVelocity}`);
+			console.log(`fps: ${fps} \nballVelocity: ${Math.round((ballVelocity * 100) / 100)}`);
 		}
 		if(event.key == 'ArrowDown'){
 			fps--;
-			console.log(`fps: ${fps} \nballVelocity: ${ballVelocity}`);
+			console.log(`fps: ${fps} \nballVelocity: ${Math.round((ballVelocity * 100) / 100)}`);
 		}
 
 		if (event.key == 'b'){
@@ -179,7 +179,7 @@ function initialBallMotion() {
 	ballSpeedX = Math.cos(Math.PI/10 * (frame))*8;
 	ballSpeedY = Math.sin(Math.PI/8 * (frame))*8;
 
-	if(logLevel % 4 == 2) console.log(`ballSpeedX: ${ballSpeedX} \nballSpeedY: ${ballSpeedY}`);
+	if(logLevel % 4 == 2) console.log(`ballSpeedX: ${Math.round((ballSpeedX * 100) / 100)} \nballSpeedY: ${Math.round((ballSpeedY * 100) / 100)}`);
 
 	if(randomizeGame == frame) playBall = true;
 	
@@ -206,9 +206,9 @@ function moveBall() {
 					// Math.abs(Math)
 					if (hitCount % 3 === 0) ballSpeedX = ballSpeedX + 1
 
-					if(logEnabled)console.log("ballVelocity: " + ballVelocity + "\npaddleVelocity: " + paddleVelocity + "\nballSpeedX: " + ballSpeedX + "\nballSpeedY: " + ballSpeedY);
+					if(logLevel % 4 == 3)console.log(`ballVelocity: ${Math.round((ballVelocity * 100) / 100)} \npaddleVelocity: ${Math.round((paddleVelocity * 100) / 100)} \nballSpeedX: ${Math.round((ballSpeedX * 100) / 100)} \nballSpeedY: ${Math.round((ballSpeedY * 100) / 100)}`);
 				}
-				else if(logEnabled) console.log("ball MISSED" + "\nballY: " + ballY + "\npaddleTop: " + paddleTop + "\nball bottom-left corner: " + (ballY + (ballRadius * (Math.sqrt(2)))/2) + "\npaddleBottom: " + paddleBottom + "\nball top-left corner: " + (ballY - (ballRadius * (Math.sqrt(2)))/2));
+				else if(logLevel % 4 == 3) console.log(`MISSED BALL \nballY: ${Math.round((ballY * 100) / 100)} \npaddleTop: ${Math.round((paddleTop * 100) / 100)} \nball bottom-left corner: ${Math.round(((ballY + (ballRadius * (Math.sqrt(2)))/2) * 100) / 100)} \npaddleBottom: ${Math.round((paddleBottom * 100) / 100)} \nball top-left corner: ${Math.round(((ballY - (ballRadius * (Math.sqrt(2)))/2) * 100) / 100)}`);
 			}
 		}
 
